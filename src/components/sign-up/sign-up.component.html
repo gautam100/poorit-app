@@ -1,0 +1,261 @@
+<div class="parent">
+  <div class="container">
+    <div class="row pt-4">
+      <!-- Left Blank Side -->
+      <div class="col-lg-2"><img src="poorit_logo.png" width="200px" /></div>
+
+      <!-- Right Side Form -->
+      <div
+        class="col-lg-10 pt-4 d-flex align-items-center justify-content-center right-side"
+      >
+        <div class="form-2-wrapper">
+          <div *ngIf="errorMessage!=''">
+            <div class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+          </div>
+          <div *ngIf="isSuccess">
+            <div class="alert alert-success">
+              Account created successfully. 
+            </div>
+          </div>
+
+          <h3 class="text-center mb-4 text-dark">
+            <i class="bi bi-person-fill"></i> Create Account
+          </h3>
+          <form #form="ngForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="name" class="mt-2"
+                    ><strong>Full Name</strong></label
+                  >
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control text-dark"
+                    #name="ngModel"
+                    [(ngModel)]="userObj.name"
+                    id="name"
+                    name="name"
+                    placeholder="Enter Your Name"
+                    autocomplete="off"
+                    minlength="3"
+                    maxlength="100"
+                    required="required"
+                  />
+
+                  <div class="text-danger">
+                    @if((name.touched || name.dirty) &&
+                    name.errors?.['required']){
+                    <span>Full Name is required</span>
+                    } @else if((name.touched || name.dirty) &&
+                    name.errors?.['minlength']){
+                    <span>Min 3 Characters are required</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="email" class="mt-2"><strong>Email</strong></label>
+                </div>
+                <div class="col">
+                  <input
+                    type="email"
+                    class="form-control text-dark"
+                    [(ngModel)]="userObj.email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Your Email"
+                    autocomplete="off"
+                    maxlength="110"
+                    #email="ngModel"
+                    required="required"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                  />
+                  <div class="text-danger">
+                    @if(email.invalid && (email.touched || email.dirty) &&
+                    email.errors?.['required']){
+                    <span>Email Id is required!</span>
+                    }@else if (email.hasError('pattern')) {
+                    <span>Invalid email.</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="password" class="mt-2"
+                    ><strong>Password</strong></label
+                  >
+                </div>
+                <div class="col">
+                  <input
+                    type="password"
+                    class="form-control text-dark"
+                    id="password"
+                    name="password"
+                    #password="ngModel"
+                    [(ngModel)]="userObj.password"
+                    placeholder="Enter a strong password"
+                    autocomplete="off"
+                    minlength="6"
+                    maxlength="20"
+                    required="required"
+                  />
+                  <div class="text-danger">
+                    @if(password.invalid && (password.touched || password.dirty)
+                    && password.errors?.['required']){
+                    <span>Password is required</span>
+                    } @else if((password.touched || password.dirty) &&
+                    (password.errors?.['minlength'] ||
+                    password.errors?.['maxlength'])){
+                    <span
+                      >Length of password should be between 6 and 20
+                      characters!</span
+                    >
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="mobile" class="mt-2"
+                    ><strong>Mobile</strong></label
+                  >
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control text-dark"
+                    id="mobile"
+                    name="mobile"
+                    #mobile="ngModel"
+                    [(ngModel)]="userObj.mobile"
+                    placeholder="Enter Mobile Number"
+                    autocomplete="off"
+                    maxlength="10"
+                    minlength="10"
+                    required="required"
+                  />
+                  <div class="text-danger">
+                    @if((mobile.touched || mobile.dirty) &&
+                    mobile.errors?.['required']){
+                    <span>Mobile is required</span>
+                    } @else if((mobile.touched || mobile.dirty) &&
+                    mobile.errors?.['maxlength'] ||
+                    mobile.errors?.['minlength']){
+                    <span>Ten digits are required in mobile.</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="gender"><strong>Gender</strong></label>
+                </div>
+                <div class="col">
+                  <div class="form-check float-start">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="gender"
+                      id="gender1"
+                      value="male"
+                      [(ngModel)]="userObj.gender"
+                      checked
+                    />
+                    <label class="form-check-label" for="gender1">
+                      Male&nbsp;&nbsp;&nbsp;
+                    </label>
+                  </div>
+                  <div class="form-check float-start">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="gender"
+                      id="gender2"
+                      value="female"
+                      [(ngModel)]="userObj.gender"
+                    />
+                    <label class="form-check-label" for="gender2">
+                      Female&nbsp;&nbsp;&nbsp;
+                    </label>
+                  </div>
+                  <div class="form-check float-start">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="gender"
+                      id="gender3"
+                      value="others"
+                      [(ngModel)]="userObj.gender"
+                    />
+                    <label class="form-check-label" for="gender3">
+                      Others
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-box">
+              <div class="row">
+                <div class="col-2">
+                  <label for="college" class="mt-3"
+                    ><strong>Institute</strong></label
+                  >
+                </div>
+                <div class="col">
+                  <select class="form-control" name="organization" id="organization" [(ngModel)]="userObj.organization" required>
+                    <option value="">Select Institute</option>
+                    <option *ngFor="let org of organizations" [value]="org.id">
+                      {{ org.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-outline-secondary login-btn w-100 mb-3"
+              [disabled]="form.invalid"
+            >
+            <span class="loading-spinner" *ngIf="loading"></span>
+            {{loading ? 'Creating Account...' : 'Sign Up'}}
+
+            </button>
+          </form>
+
+          <!-- Register Link -->
+          <p class="text-center register-test mt-3">
+            <a [routerLink]="['/login']" class="text-decoration-none"
+              >Already have an account?</a
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    {{ formValue | json }}
+  </div>
+</div>

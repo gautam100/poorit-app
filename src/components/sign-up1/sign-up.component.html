@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="left-section">
+      <h1 class="welcome-text">Register Yourself</h1>
+      <p>Join thousands of users and get access to amazing features!</p>
+  </div>
+  <div class="right-section">
+      <h1>Create Account</h1>
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+          <div class="form-group floating">
+              <input type="text" class="form-control" formControlName="fullName" placeholder=" ">
+              <label>Full Name</label>
+              <div class="error-message" *ngIf="isFieldInvalid('fullName')">Full name is required</div>
+          </div>
+
+          <div class="form-group floating">
+              <input type="email" class="form-control" formControlName="email" placeholder=" ">
+              <label>Email Address</label>
+              <div class="error-message" *ngIf="isFieldInvalid('email')">Valid email is required</div>
+          </div>
+
+          <div class="form-group floating">
+              <input type="password" class="form-control" formControlName="password" placeholder=" ">
+              <label>Password</label>
+              <div class="error-message" *ngIf="isFieldInvalid('password')">Password must be at least 6 characters</div>
+          </div>
+
+          <div class="form-group floating">
+              <input type="tel" class="form-control" formControlName="mobile" placeholder=" ">
+              <label>Mobile Number</label>
+              <div class="error-message" *ngIf="isFieldInvalid('mobile')">Mobile number must be 10 digits</div>
+          </div>
+
+          <div class="form-group">
+              <label>Gender</label>
+              <div class="radio-group">
+                  <label class="radio-option">
+                      <input type="radio" formControlName="gender" value="male">
+                      <span>Male</span>
+                  </label>
+                  <label class="radio-option">
+                      <input type="radio" formControlName="gender" value="female">
+                      <span>Female</span>
+                  </label>
+                  <label class="radio-option">
+                      <input type="radio" formControlName="gender" value="other">
+                      <span>Other</span>
+                  </label>
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('gender')">Please select a gender</div>
+          </div>
+
+          <div class="form-group">
+              <label>Organization</label>
+              <select class="form-control" formControlName="organization">
+                  <option value="">Select Organization</option>
+                  <option *ngFor="let org of organizations" [value]="org.id">{{org.name}}</option>
+              </select>
+              <div class="error-message" *ngIf="isFieldInvalid('organization')">Please select an organization</div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="signupForm.invalid || loading">
+              <span class="loading-spinner" *ngIf="loading"></span>
+              {{loading ? 'Creating Account...' : 'Sign Up'}}
+          </button>
+      </form>
+  </div>
+</div>

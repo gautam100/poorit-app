@@ -1,0 +1,13 @@
+.exam-container {
+    /* max-width: 800px; */
+    margin: 30px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.timer {
+    font-size: 24px;
+    font-weight: bold;
+    /* color: #dc3545; */
+}

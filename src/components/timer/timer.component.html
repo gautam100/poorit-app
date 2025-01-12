@@ -1,0 +1,14 @@
+<div class="timer-container">
+    <div 
+      [ngClass]="{
+        'timer': true, 
+        'text-danger': minutes <= 5 && seconds > 0,
+        'text-warning': minutes <= 10 && minutes > 5
+      }"
+    >
+      {{ formattedTime }}
+    </div>
+    <div *ngIf="isTimeExpired" class="alert alert-danger">
+      Time is up! Exam submitted automatically.
+    </div>
+  </div>

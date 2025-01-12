@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <div class="row align-items-center py-3 bg-light shadow-sm">
+      <div class="col-md-2 d-flex align-items-center">
+        <img src="poorit_logo.png" width="150px" class="img-fluid" />
+      </div>
+      <div class="col-md-8 text-center">
+        <h2 class="text-primary">Welcome to Poorit</h2>
+      </div>
+      <div class="col-md-2 text-end">
+        <div class="dropdown">
+          <button
+            class="btn btn-primary dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-person-circle"></i> Account
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" (click)="logout()">Signout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+  

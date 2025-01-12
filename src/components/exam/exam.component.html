@@ -1,0 +1,108 @@
+<div class="exam-container">
+  <div class="row mb-1">
+    <div class="col-2">&nbsp;</div>
+    <div class="col-8">
+      <ng-container *ngIf="data[categoryPointer]?.length; else noQuestions">
+        <span
+          *ngFor="let quesNo of data[categoryPointer]; let idx = index"
+          class="badge m-1"
+          [ngClass]="
+            quesNo.index === quesPointer ? 'bg-primary' : 'bg-secondary'
+          "
+          >{{ idx + 1 }}</span
+        >
+      </ng-container>
+      <ng-template #noQuestions>
+        <div class="alert alert-warning">No Questions Found!</div>
+      </ng-template>
+    </div>
+    <div class="col-2 text-end">
+      <div id="timer" class="timer"><app-timer></app-timer></div>
+    </div>
+  </div>
+  <div class="row mb-1">
+    <div class="col-2">
+      <div class="card mb-4">
+        <div class="card-body">
+          <ng-container *ngFor="let catData of data; let idx = index">
+            <div
+              [ngClass]="{
+                'text-primary fw-bold':
+                  catData[idx].category ===
+                  data[categoryPointer][quesPointer].category,
+                'text-secondary fw-bold':
+                  catData[idx].category !==
+                  data[categoryPointer][quesPointer].category
+              }"
+            >
+              {{ catData[idx].category }}
+              <span
+                class="badge"
+                [ngClass]="
+                  catData[idx].category ===
+                  data[categoryPointer][quesPointer].category
+                    ? 'bg-primary'
+                    : 'bg-secondary'
+                "
+                >{{ catData.length }}</span
+              >
+            </div>
+            <hr />
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <div class="col-10">
+      <div id="examQuestions" *ngIf="!isTestFinish">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title font-monospace">
+              Question {{ data[categoryPointer][quesPointer].index + 1 }}:
+              {{ data[categoryPointer][quesPointer].question }}
+            </h5>
+            <ng-container
+              *ngFor="let opt of data[categoryPointer][quesPointer].options"
+            >
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="question2" />
+                <label class="form-check-label" for="q2option1">{{
+                  opt.option
+                }}</label>
+              </div>
+            </ng-container>
+          </div>
+          <div class="card-footer">
+            <div class="row">
+              <div class="col-6">
+                <button class="btn btn-primary" (click)="skipQuestion()">
+                  Skip
+                </button>
+              </div>
+              <div class="col-6 text-end">
+                <button
+                  id="submitBtn"
+                  class="btn btn-primary"
+                  [disabled]="isTestFinish"
+                  (click)="nextQuestion()"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="examQuestions" *ngIf="isTestFinish">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title font-monospace">
+              Test Finished! Please click on the below button to check your
+              result...
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

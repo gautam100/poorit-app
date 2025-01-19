@@ -2,90 +2,97 @@
   <div class="row mb-1">
     <div class="col-2">&nbsp;</div>
     <div class="col-8">
-      <ng-container *ngIf="data[categoryPointer]?.length; else noQuestions">
-        <span
-          *ngFor="let quesNo of data[categoryPointer]; let idx = index"
-          class="badge m-1"
-          [ngClass]="
-            quesNo.index === quesPointer ? 'bg-primary' : 'bg-secondary'
-          "
-          >{{ idx + 1 }}</span
-        >
+      <ng-container *ngIf="totalQuestions > 0">
+        <span class="badge m-1"
+        [ngClass]="quesPointer === index? 'bg-primary' : 'bg-secondary'" *ngFor="let i of [].constructor(totalQuestions); let index = index">{{index + 1}}</span>
       </ng-container>
-      <ng-template #noQuestions>
-        <div class="alert alert-warning">No Questions Found!</div>
-      </ng-template>
+      <!-- <ng-container *ngIf="totalQuestions == 0">
+        <div class="alert alert-warning">
+          No questions available for the selected category!
+        </div>
+      </ng-container> -->
     </div>
     <div class="col-2 text-end">
-      <div id="timer" class="timer"><app-timer></app-timer></div>
+      <div id="timer" class="timer">
+        <app-timer></app-timer>
+      </div>
     </div>
   </div>
+
   <div class="row mb-1">
     <div class="col-2">
       <div class="card mb-4">
         <div class="card-body">
-          <ng-container *ngFor="let catData of data; let idx = index">
-            <div
-              [ngClass]="{
+          <div *ngIf="loaderCategory">
+            <app-loader></app-loader>
+          </div>
+          <ng-container *ngFor="let category of categories; let idx = index">
+            <div [ngClass]="{
                 'text-primary fw-bold':
-                  catData[idx].category ===
-                  data[categoryPointer][quesPointer].category,
+                  currentCategory.cat_name === category.cat_name,
                 'text-secondary fw-bold':
-                  catData[idx].category !==
-                  data[categoryPointer][quesPointer].category
-              }"
-            >
-              {{ catData[idx].category }}
-              <span
-                class="badge"
-                [ngClass]="
-                  catData[idx].category ===
-                  data[categoryPointer][quesPointer].category
-                    ? 'bg-primary'
-                    : 'bg-secondary'
-                "
-                >{{ catData.length }}</span
-              >
+                  currentCategory.cat_name !== category.cat_name
+              }">
+              {{ category.cat_name }}
+              <span class="badge" [ngClass]="{
+                  'bg-primary':
+                    currentCategory.cat_name === category.cat_name,
+                  'bg-secondary':
+                    currentCategory.cat_name !== category.cat_name
+                }">
+                {{ totalQuestions }}
+              </span>
             </div>
             <hr />
           </ng-container>
+          <div *ngIf="categoryError" class="alert alert-danger" role="alert">
+            Error! No categories available in Database! 
+            Please contact to the Administrator.
+          </div>
         </div>
       </div>
     </div>
     <div class="col-10">
-      <div id="examQuestions" *ngIf="!isTestFinish">
+      <div>
+        <div *ngIf="QuestionError">
+          <div class="alert alert-danger" role="alert">
+            Error! No questions available in Database for the selected category! 
+            Please contact to the Administrator.
+          </div>
+        </div>
         <div class="card mb-4">
           <div class="card-body">
+            <div *ngIf="loaderQuestion">
+              <app-loader></app-loader>
+            </div>
             <h5 class="card-title font-monospace">
-              Question {{ data[categoryPointer][quesPointer].index + 1 }}:
-              {{ data[categoryPointer][quesPointer].question }}
+              Question {{quesPointer+1}}: {{ currentQuestion.question }}
             </h5>
-            <ng-container
-              *ngFor="let opt of data[categoryPointer][quesPointer].options"
-            >
+            <ng-container *ngFor="let opt of currentQuestion.options">
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="question2" />
-                <label class="form-check-label" for="q2option1">{{
-                  opt.option
-                }}</label>
+                <input class="form-check-input" type="radio" name="option" [value]="opt.option_id" [(ngModel)]="selectedOptions" />
+                <label class="form-check-label" for="option">
+                  {{ opt.option_text }}
+                </label>
               </div>
             </ng-container>
+            <div class="mt-3 p-3 border border-danger text-danger">
+              <!-- {{selectedOptions}} --- {{currentQuestion.correct_answer}}<br> -->
+            Score: {{score}}<br>
+            Result Array: {{resultArray|json}}
+            </div>
+            
           </div>
           <div class="card-footer">
             <div class="row">
               <div class="col-6">
-                <button class="btn btn-primary" (click)="skipQuestion()">
-                  Skip
+                <button class="btn btn-primary" (click)="previousQuestion()">
+                  << Previous
                 </button>
               </div>
               <div class="col-6 text-end">
-                <button
-                  id="submitBtn"
-                  class="btn btn-primary"
-                  [disabled]="isTestFinish"
-                  (click)="nextQuestion()"
-                >
-                  Next
+                <button id="submitBtn" class="btn btn-primary" [disabled]="isTestFinish" (click)="nextQuestion()">
+                  Next >>
                 </button>
               </div>
             </div>

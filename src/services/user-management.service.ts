@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { constant } from '../constant/constant';
 
 export interface SignupRequest {
   name: string;
@@ -28,7 +29,7 @@ export interface AuthResponse {
 })
 export class UserManagementService {
   
-  private baseUrl = 'http://localhost:3000/api';
+  //private baseUrl = constant.BASE_URL;
 
   constructor(private http:HttpClient) { 
   }
@@ -39,7 +40,7 @@ export class UserManagementService {
         'Content-Type': 'application/json'
       })
     };
-    return this.http.post<AuthResponse>(`${this.baseUrl}/signup`, {
+    return this.http.post<AuthResponse>(`${constant.BASE_URL}/signup`, {
       name: userData.name,
       email: userData.email,
       password: userData.password,
@@ -50,7 +51,7 @@ export class UserManagementService {
   }
 
   login(loginData: LoginInterface): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, loginData)
+    return this.http.post<AuthResponse>(`${constant.BASE_URL}/login`, loginData)
     .pipe(
       map(response => {
         // Store token in localStorage if login is successful

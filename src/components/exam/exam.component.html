@@ -40,11 +40,14 @@
                   'bg-secondary':
                     currentCategory.cat_name !== category.cat_name
                 }">
-                {{ totalQuestions }}
+                {{ totalQuestions }} 
               </span>
             </div>
             <hr />
           </ng-container>
+          <!-- CategoryFinish: {{isCategoryFinish}} <br>
+          QuesPointer: {{quesPointer}} <br>
+          TotalQues: {{totalQuestions}} -->
           <div *ngIf="categoryError" class="alert alert-danger" role="alert">
             Error! No categories available in Database! 
             Please contact to the Administrator.
@@ -54,19 +57,52 @@
     </div>
     <div class="col-10">
       <div>
-        <div *ngIf="QuestionError">
-          <div class="alert alert-danger" role="alert">
-            Error! No questions available in Database for the selected category! 
-            Please contact to the Administrator.
+
+        <div *ngIf="isTestFinish" [@slideInOut] class="bg-warning rounded border border-warning">
+          <div class="card bg-warning">
+            <div class="card-body">
+              <h2 class="card-title">
+                Test Finished! 
+              </h2>
+              <div class="mt-4 mb-4">
+                <span class="text-muted">
+                  Click On the below button to check your result.
+                </span>
+              </div>
+              <br>
+              <button id="finishBtn" class="btn btn-lg btn-success">
+                <i class="bi bi-bounding-box"></i> Result 
+              </button>
+            </div>
           </div>
         </div>
-        <div class="card mb-4">
+
+        <div *ngIf="isCategoryFinish" [@slideInOut] class="bg-warning rounded border border-warning">
+          <div class="card bg-warning">
+            <div class="card-body">
+              <h5 class="card-title">
+                Good Job! You have completed all the questions for the category <strong>"{{currentCategory.cat_name}}"</strong>.
+              </h5>
+              <div class="mt-4 mb-4">
+                <span class="text-muted">
+                  Click On the below button to proceed to the next category.
+                </span>
+              </div>
+              <br>
+              <button id="submitBtn" class="btn btn-lg btn-success" (click)="nextQuestion()">
+                <i class="bi bi-hourglass-split"></i> Proceed to Next Category 
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4" *ngIf="!isCategoryFinish && !isTestFinish" [@fadeInOut]>
           <div class="card-body">
             <div *ngIf="loaderQuestion">
               <app-loader></app-loader>
             </div>
             <h5 class="card-title font-monospace">
-              Question {{quesPointer+1}}: {{ currentQuestion.question }}
+              Question {{quesPointer+1}}: {{ currentQuestion.question }}<!--Error: .question is undefined during category switch-->
             </h5>
             <ng-container *ngFor="let opt of currentQuestion.options">
               <div class="form-check">
@@ -76,8 +112,8 @@
                 </label>
               </div>
             </ng-container>
+
             <div class="mt-3 p-3 border border-danger text-danger">
-              <!-- {{selectedOptions}} --- {{currentQuestion.correct_answer}}<br> -->
             Score: {{score}}<br>
             Result Array: {{resultArray|json}}
             </div>
@@ -86,30 +122,31 @@
           <div class="card-footer">
             <div class="row">
               <div class="col-6">
-                <button class="btn btn-primary" (click)="previousQuestion()">
-                  << Previous
+                <button class="btn btn-primary" [disabled]="quesPointer==0" (click)="previousQuestion()">
+                  <i class="bi bi-skip-backward-fill"></i> Previous
                 </button>
               </div>
               <div class="col-6 text-end">
                 <button id="submitBtn" class="btn btn-primary" [disabled]="isTestFinish" (click)="nextQuestion()">
-                  Next >>
+                  Next <i class="bi bi-skip-forward-fill"></i>
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="examQuestions" *ngIf="isTestFinish">
-        <div class="card mb-4">
-          <div class="card-body">
-            <h5 class="card-title font-monospace">
-              Test Finished! Please click on the below button to check your
-              result...
-            </h5>
+        <div *ngIf="QuestionError">
+          <div class="alert alert-danger" role="alert">
+            Error! No questions available in Database for the selected category! 
+            Please contact to the Administrator.
           </div>
         </div>
+        
       </div>
+
+      
+
+
     </div>
   </div>
 </div>

@@ -16,8 +16,8 @@ export class ExamManagementService {
   getCategories(): Observable<any>{
     return this.http.get(`${constant.BASE_URL}/categories`);
   }
-  getQuestions(): Observable<any>{
-    return this.http.get(`${constant.BASE_URL}/questions`);
+  getQuestions(ques_table:string, options_table:string): Observable<any>{
+    return this.http.get(`${constant.BASE_URL}/questions/`+ques_table+`/`+options_table);
   }
   
 

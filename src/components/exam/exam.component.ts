@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { switchMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { TimerComponent } from '../timer/timer.component';
 import { CommonModule } from '@angular/common';
 import { ExamManagementService } from '../../services/exam-management.service';
 import { LoaderComponent } from "../loader/loader.component";
+import { trigger, state, style, transition, animate } from '@angular/animations';
+//import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-exam',
@@ -11,128 +15,29 @@ import { LoaderComponent } from "../loader/loader.component";
   imports: [FormsModule, TimerComponent, CommonModule, LoaderComponent],
   templateUrl: './exam.component.html',
   styleUrl: './exam.component.css',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('500ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('500ms ease-out', style({ opacity: 0 }))
+      ])
+    ]),
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ transform: 'translateX(-100%)' }),
+        animate('500ms ease-in', style({ transform: 'translateX(0%)' }))
+      ]),
+      transition(':leave', [
+        animate('500ms ease-out', style({ transform: 'translateX(-100%)' }))
+      ])
+    ])
+  ]
 })
+
 export class ExamComponent {
-  data: any[] = [
-    // [
-    //   {
-    //     index: 1,
-    //     categoryId: 5,
-    //     category: 'Cloud',
-    //     subCategoryId: 6,
-    //     subCategory: 'AWS',
-    //     questionId: 12,
-    //     question: 'What is EC2 service in AWS?',
-    //     options: [
-    //       {
-    //         optionId: 205,
-    //         option: 'It is used to create K8S in AWS',
-    //       },
-    //       {
-    //         optionId: 206,
-    //         option:
-    //           'It is security feature to prvent DDOS and brut droce attack.',
-    //       },
-    //       {
-    //         optionId: 207,
-    //         option: 'It is a Virtual Machine or server of AWS',
-    //       },
-    //       {
-    //         optionId: 208,
-    //         option: 'It is used to create Load-balancers in server',
-    //       },
-    //     ],
-    //     correctAnswer: '207',
-    //   },
-    //   {
-    //     index: 2,
-    //     categoryId: 5,
-    //     category: 'Cloud',
-    //     subCategoryId: 6,
-    //     subCategory: 'AWS',
-    //     questionId: 13,
-    //     question: 'What is IAAS in Cloud?',
-    //     options: [
-    //       {
-    //         optionId: 209,
-    //         option: 'It is used to provide on-demand storage',
-    //       },
-    //       {
-    //         optionId: 210,
-    //         option: 'It is used to provide on-demand networking',
-    //       },
-    //       {
-    //         optionId: 211,
-    //         option: 'It is used to provide on-demand virtualization',
-    //       },
-    //       {
-    //         optionId: 212,
-    //         option: 'All Of the above',
-    //       },
-    //     ],
-    //     correctAnswer: '212',
-    //   },
-    // ],
-    // [
-    //   {
-    //     index: 0,
-    //     categoryId: 6,
-    //     category: 'DevOps',
-    //     subCategoryId: 9,
-    //     subCategory: 'K8S',
-    //     questionId: 21,
-    //     question:
-    //       'Which of the below is/are container orchestration technologies?',
-    //     options: [
-    //       {
-    //         optionId: 301,
-    //         option: 'Docker Swarn',
-    //       },
-    //       {
-    //         optionId: 302,
-    //         option: 'Mesos',
-    //       },
-    //       {
-    //         optionId: 303,
-    //         option: 'Kubernetes',
-    //       },
-    //       {
-    //         optionId: 304,
-    //         option: 'All of these',
-    //       },
-    //     ],
-    //     correctAnswer: '304',
-    //   },
-    //   {
-    //     index: 1,
-    //     categoryId: 6,
-    //     category: 'DevOps',
-    //     subCategoryId: 9,
-    //     subCategory: 'K8S',
-    //     questionId: 21,
-    //     question: 'Which of the below are container runtimes?',
-    //     options: [
-    //       {
-    //         optionId: 305,
-    //         option: 'CRI-O',
-    //       },
-    //       {
-    //         optionId: 306,
-    //         option: 'Containerd',
-    //       },
-    //       {
-    //         optionId: 307,
-    //         option: 'Docker-Engine',
-    //       },
-    //       {
-    //         optionId: 308,
-    //         option: 'All of these',
-    //       },
-    //     ],
-    //     correctAnswer: '308',
-    //   },
-    // ],
-  ];
   questions: any[] = [];
   categories: any[] = [];
   currentQuestion: any = {};
@@ -145,93 +50,142 @@ export class ExamComponent {
   loaderQuestion: boolean = true;
   categoryError: boolean = false;
   QuestionError: boolean = false;
-
   categoryPointer: number = 0;
   quesPointer: number = 0;
+  isCategoryFinish: boolean = false;
   isTestFinish: boolean = false;
 
   constructor(private examService: ExamManagementService) {
   }
 
   ngOnInit() {
-    this.examService.getCategories().subscribe((response) => {
-      console.log(response);
-      this.categories = response.categories;
-      this.loaderCategory = false;
-      if (this.categories.length > 0){
-        this.currentCategory = this.categories[0];
-        //User's answers will be save in resultArray category wise.
-        for(let category of this.categories){
-          this.resultArray.push({
-            category: category.cat_name,
-            answers: [],
-          })
+    // Fetch the categories and questions from the API    
+    this.examService.getCategories()
+      .pipe(
+        switchMap((response) => {
+          this.categories = response.categories;
+          this.loaderCategory = false;
+          if (this.categories.length > 0) {
+            this.currentCategory = this.categories[0];
+            //User's answers will be save in resultArray category wise.
+            for (let category of this.categories) {
+              this.resultArray.push({
+                category: category.cat_name,
+                answers: [],
+              })
+            }
+            //console.log(this.resultArray);
+          } else {
+            console.log("No Categories Found in Database");
+            this.categoryError = true;
+          }
+          // Use the category response to call the second API
+          return this.examService.getQuestions(this.categories[0].ques_table, this.categories[0].options_table);
+        }),
+        catchError(error => {
+          console.error('Error occurred:', error);
+          return of({ error: 'An error occurred while fetching data' });
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.questions = response.questions;
+          //this.loaderQuestion = false;
+          this.totalQuestions = this.questions.length;
+          if (this.totalQuestions > 0) {
+            this.currentQuestion = this.questions[this.quesPointer];
+          } else {
+            console.log("No Questions Found in Database for the selected category");
+            this.QuestionError = true;
+          }
+        },
+        error: (error) => {
+          //this.error = 'An error occurred while fetching data';
+          this.QuestionError = true;
+          this.loaderQuestion = false;
+        },
+        complete: () => {
+          this.loaderQuestion = false;
         }
-        //console.log(this.resultArray);
-      }else{
-        console.log("No Categories Found in Database");
-        this.categoryError = true;
-      }
-    });
-    
-    this.examService.getQuestions().subscribe((response) => {
-      console.log(response);
-      this.questions = response.questions;
-      this.loaderQuestion = false;
-      this.totalQuestions = this.questions.length;
-      if(this.totalQuestions > 0){
-        this.currentQuestion = this.questions[this.quesPointer];
-      }else{
-        console.log("No Questions Found in Database for the selected category");
-        this.QuestionError = true;
-      }
-    });
+      });
+
+
   }
+  
   nextQuestion() {
     //Check if the last question of the last category is reached
     if (this.categoryPointer == this.categories.length - 1) {
-      if(this.quesPointer == this.questions.length - 1) {
+      if (this.quesPointer == this.questions.length - 1) {
         console.log("Test Completed");
         this.isTestFinish = true;
+        //Redirect to the resultComponent
         return;
       }
     }
 
     // Logic to change Category and Question on next button click
-    if (this.quesPointer < this.totalQuestions-1) {
+    if (this.quesPointer < this.totalQuestions) {
+      //debugger;
       //Check if the selected option is correct or not
-      if(Number(this.decodeCorrectAnswer(this.questions[this.quesPointer].correct_answer)) == this.selectedOptions){
+      if (Number(this.decodeCorrectAnswer(this.questions[this.quesPointer].correct_answer)) == this.selectedOptions) {
         this.score += 1;
         //Push the correct answer in resultArray
         this.resultArray[this.categoryPointer].answers.push({
           [this.quesPointer]: "Correct"
         });
-      }else{
+      } else {
         //Push the incorrect answer in resultArray
         this.resultArray[this.categoryPointer].answers.push({
           [this.quesPointer]: "Incorrect"
         });
       }
       this.quesPointer += 1; //Increment the question pointer
-      this.currentQuestion = this.questions[this.quesPointer];
+      if(this.questions[this.quesPointer]!==undefined){
+        this.currentQuestion = this.questions[this.quesPointer];//Set the next question
+      }
       this.selectedOptions = 0; //Reset the selected option
-    }
-  }
-
-  previousQuestion() {
-    if (this.quesPointer > 0) {
-      this.quesPointer--;
+      if(this.quesPointer === this.totalQuestions){
+        this.isCategoryFinish = true;
+      }
+    } else {
+      //Increment the category pointer and reset the question pointer
+      this.categoryPointer += 1;
+      this.quesPointer = 0;
+      this.currentCategory = this.categories[this.categoryPointer];
       this.currentQuestion = this.questions[this.quesPointer];
-      this.resultArray[this.categoryPointer].answers.pop();
-      this.score -= 1;
+      //(API Call) Fetch the questions for the new category
+      this.examService.getQuestions(this.currentCategory.ques_table, this.currentCategory.options_table).subscribe((response) => {
+        console.log(response);
+        this.questions = response.questions;
+        this.loaderQuestion = false;
+        this.totalQuestions = this.questions.length;
+        if (this.totalQuestions > 0) {
+          this.currentQuestion = this.questions[this.quesPointer];
+          this.isCategoryFinish = false;
+        } else {
+          console.log("No Questions Found in Database for the selected category");
+          this.QuestionError = true;
+        }
+      });
     }
-  }
-
-  skipQuestion() {
 
   }
 
-  decodeCorrectAnswer(correctAnswer: string) {
-    return atob(correctAnswer);
-  } 
+
+previousQuestion() {
+  if (this.quesPointer > 0) {
+    this.quesPointer--;
+    this.currentQuestion = this.questions[this.quesPointer];
+    this.resultArray[this.categoryPointer].answers.pop();
+    this.score -= 1;
+  }
+}
+
+skipQuestion() {
+
+}
+
+decodeCorrectAnswer(correctAnswer: string) {
+  return atob(correctAnswer);
+} 
 }

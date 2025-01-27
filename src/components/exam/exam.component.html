@@ -3,8 +3,10 @@
     <div class="col-2">&nbsp;</div>
     <div class="col-8">
       <ng-container *ngIf="totalQuestions > 0">
-        <span class="badge m-1"
-        [ngClass]="quesPointer === index? 'bg-primary' : 'bg-secondary'" *ngFor="let i of [].constructor(totalQuestions); let index = index">{{index + 1}}</span>
+        <span class="badge m-1" [ngClass]="quesPointer === index ? 'bg-primary' : 'bg-secondary'"
+          *ngFor="let i of [].constructor(totalQuestions); let index = index">
+          {{ index + 1 }}
+        </span>
       </ng-container>
       <!-- <ng-container *ngIf="totalQuestions == 0">
         <div class="alert alert-warning">
@@ -35,62 +37,58 @@
               }">
               {{ category.cat_name }}
               <span class="badge" [ngClass]="{
-                  'bg-primary':
-                    currentCategory.cat_name === category.cat_name,
-                  'bg-secondary':
-                    currentCategory.cat_name !== category.cat_name
+                  'bg-primary': currentCategory.cat_name === category.cat_name,
+                  'bg-secondary': currentCategory.cat_name !== category.cat_name
                 }">
-                {{ totalQuestions }} 
+                {{ totalQuestions }}
               </span>
             </div>
             <hr />
           </ng-container>
-          <!-- CategoryFinish: {{isCategoryFinish}} <br>
-          QuesPointer: {{quesPointer}} <br>
-          TotalQues: {{totalQuestions}} -->
           <div *ngIf="categoryError" class="alert alert-danger" role="alert">
-            Error! No categories available in Database! 
-            Please contact to the Administrator.
+            Error! No categories available in Database! Please contact to the
+            Administrator.
           </div>
         </div>
       </div>
     </div>
     <div class="col-10">
       <div>
-
         <div *ngIf="isTestFinish" [@slideInOut] class="bg-warning rounded border border-warning">
           <div class="card bg-warning">
             <div class="card-body">
-              <h2 class="card-title">
-                Test Finished! 
-              </h2>
+              <h2 class="card-title">Test Finished!</h2>
               <div class="mt-4 mb-4">
+                <h4>Total Questions: {{grandTotalQues}}</h4>
+                <h5>Total Correct Answers: <span class="text-success"> {{totalCorrect}}</span></h5>
+                <h5>Total Incorrect Answers: <span class="text-danger"> {{totalIncorrect}}</span></h5>
                 <span class="text-muted">
-                  Click On the below button to check your result.
+                  Your Total Score is {{grandScore}} out of {{grandTotalQues}}
                 </span>
               </div>
-              <br>
+              <br />
               <button id="finishBtn" class="btn btn-lg btn-success">
-                <i class="bi bi-bounding-box"></i> Result 
+                <i class="bi bi-bounding-box"></i> Result
               </button>
             </div>
           </div>
         </div>
 
-        <div *ngIf="isCategoryFinish" [@slideInOut] class="bg-warning rounded border border-warning">
+        <div *ngIf="isCategoryFinish && !isTestFinish" [@slideInOut] class="bg-warning rounded border border-warning">
           <div class="card bg-warning">
             <div class="card-body">
               <h5 class="card-title">
-                Good Job! You have completed all the questions for the category <strong>"{{currentCategory.cat_name}}"</strong>.
+                Good Job! You have completed all the questions for the category
+                <strong>"{{ currentCategory.cat_name }}"</strong>.
               </h5>
               <div class="mt-4 mb-4">
                 <span class="text-muted">
                   Click On the below button to proceed to the next category.
                 </span>
               </div>
-              <br>
+              <br />
               <button id="submitBtn" class="btn btn-lg btn-success" (click)="nextQuestion()">
-                <i class="bi bi-hourglass-split"></i> Proceed to Next Category 
+                <i class="bi bi-hourglass-split"></i> Proceed to Next Category
               </button>
             </div>
           </div>
@@ -102,27 +100,25 @@
               <app-loader></app-loader>
             </div>
             <h5 class="card-title font-monospace">
-              Question {{quesPointer+1}}: {{ currentQuestion.question }}<!--Error: .question is undefined during category switch-->
+              Question {{ quesPointer + 1 }}: {{ currentQuestion.question
+              }}<!--Error: .question is undefined during category switch-->
             </h5>
             <ng-container *ngFor="let opt of currentQuestion.options">
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="option" [value]="opt.option_id" [(ngModel)]="selectedOptions" />
+                
+                <input class="form-check-input" type="radio" name="option" [value]="opt.option_id"
+                  [(ngModel)]="selectedOptionList[categoryPointer].selectedOption[quesPointer]"
+                  (change)="onOptionChange(opt.option_id)" [checked]="isSelected(opt.option_id)" />
                 <label class="form-check-label" for="option">
-                  {{ opt.option_text }}
+                  {{ opt.option_text }} 
                 </label>
               </div>
             </ng-container>
-
-            <div class="mt-3 p-3 border border-danger text-danger">
-            Score: {{score}}<br>
-            Result Array: {{resultArray|json}}
-            </div>
-            
           </div>
           <div class="card-footer">
             <div class="row">
               <div class="col-6">
-                <button class="btn btn-primary" [disabled]="quesPointer==0" (click)="previousQuestion()">
+                <button class="btn btn-primary" [disabled]="quesPointer == 0" (click)="previousQuestion()">
                   <i class="bi bi-skip-backward-fill"></i> Previous
                 </button>
               </div>
@@ -137,16 +133,20 @@
 
         <div *ngIf="QuestionError">
           <div class="alert alert-danger" role="alert">
-            Error! No questions available in Database for the selected category! 
+            Error! No questions available in Database for the selected category!
             Please contact to the Administrator.
           </div>
         </div>
-        
+
+        <!-- <div class="mt-3 p-3 border border-danger text-danger">
+          Score: {{ score }} -- Grand Score: {{grandScore}}<br />
+          Result Array: {{ resultArray | json }}<br>
+          <div class="text-success">
+            Option Selection {{selectedOptionList | json}}
+          </div>
+        </div> -->
+
       </div>
-
-      
-
-
     </div>
   </div>
 </div>

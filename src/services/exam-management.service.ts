@@ -1,4 +1,3 @@
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -20,6 +19,9 @@ export class ExamManagementService {
     return this.http.get(`${constant.BASE_URL}/questions/`+ques_table+`/`+options_table);
   }
   
+  saveExamResults(userId: number, resultData: any) {
+    return this.http.post(`${constant.BASE_URL}/result/${userId}`, resultData);
+  }
 
 }
 

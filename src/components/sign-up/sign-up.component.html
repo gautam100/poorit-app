@@ -224,7 +224,7 @@
                   <select class="form-control" name="organization" id="organization" [(ngModel)]="userObj.organization" required>
                     <option value="">Select Institute</option>
                     <option *ngFor="let org of organizations" [value]="org.id">
-                      {{ org.name }}
+                      {{ org.institute_name }}
                     </option>
                   </select>
                 </div>

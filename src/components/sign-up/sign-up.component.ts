@@ -4,6 +4,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserManagementService } from '../../services/user-management.service';
+import { OrganizationService } from '../../services/organization.service';
 
 interface SignupResponse {
   success: boolean;
@@ -34,19 +35,44 @@ export class SignUpComponent {
 
   formValue: any;
 
+  // List of organizations fetched from the backend
+  organizations: any[] = [];
+  isLoading = false;
+
   // Dummy organization data
-  organizations: any[] = [
-    { id: 1, name: 'Company A' },
-    { id: 2, name: 'Company B' },
-    { id: 3, name: 'Company C' },
-    { id: 4, name: 'Company D' },
-    { id: 5, name: 'Company E' },
-  ];
+  // organizations: any[] = [
+  //   { id: 1, name: 'Company A' },
+  //   { id: 2, name: 'Company B' },
+  //   { id: 3, name: 'Company C' },
+  //   { id: 4, name: 'Company D' },
+  //   { id: 5, name: 'Company E' },
+  // ];
 
   private http = inject(HttpClient);
   private router = inject(Router);
   private userService = inject(UserManagementService);
 
+  // Inject OrganizationService to fetch data
+  constructor(private organizationService: OrganizationService) {}
+
+  ngOnInit(): void {
+    this.fetchInstitutes();
+  }
+
+  fetchInstitutes(): void {
+    this.isLoading = true;
+    this.organizationService.getInstitutes().subscribe({
+      next: (data: any) => {
+        console.log('Fetched organizations:', data);  // Check if data is correct here
+        this.organizations = data;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error fetching institutes:', error);
+        this.isLoading = false;
+      },
+    });
+  }
   
   onSubmit(): void {
     this.loading = true;

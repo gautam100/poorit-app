@@ -127,27 +127,40 @@ export class ExamComponent {
   }
 
   nextQuestion() {
-    //Check if the last question of the last category is reached
     if (this.categoryPointer == this.categories.length - 1) {
-      if (this.quesPointer == this.questions.length - 1) {
-        console.log('Test Completed');
-        this.calculateScore();
-        this.isTestFinish = true;
-        this.grandScore = this.grandScore + this.score;
-        //Redirect to the resultComponent
-        for(let i=0;i<this.resultArray.length;i++){
-          for(let j=0;j<this.resultArray[i].answers.length;j++){
-            this.grandTotalQues+=1;
-            if(this.resultArray[i].answers[j].answer == "Correct"){
-              this.totalCorrect++;
-            }else{
-              this.totalIncorrect++;
+        if (this.quesPointer == this.questions.length - 1) {
+            this.calculateScore();
+            this.isTestFinish = true;
+            this.grandScore = this.grandScore + this.score;
+            
+            for(let i=0; i<this.resultArray.length; i++) {
+                for(let j=0; j<this.resultArray[i].answers.length; j++) {
+                    this.grandTotalQues+=1;
+                    if(this.resultArray[i].answers[j].answer == "Correct") {
+                        this.totalCorrect++;
+                    } else {
+                        this.totalIncorrect++;
+                    }
+                }
             }
-          }
-        }
 
-        return;
-      }
+            // Send results to backend
+            const resultData = {
+                totalQuestions: this.grandTotalQues,
+                totalCorrect: this.totalCorrect,
+                totalIncorrect: this.totalIncorrect,
+                totalSkipped: this.totalSkippedQues,
+                resultArray: this.resultArray
+            };
+
+            // Assuming user ID 1 for testing - replace with actual user ID in production
+            this.examService.saveExamResults(1, resultData).subscribe({
+                next: (response) => console.log('Results saved successfully:', response),
+                error: (error) => console.error('Error saving results:', error)
+            });
+
+            return;
+        }
     }
 
     // Logic to change Category and Question on next button click

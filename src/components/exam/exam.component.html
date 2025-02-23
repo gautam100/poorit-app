@@ -3,8 +3,18 @@
     <div class="col-2">&nbsp;</div>
     <div class="col-8">
       <ng-container *ngIf="totalQuestions > 0">
-        <span class="badge m-1" [ngClass]="quesPointer === index ? 'bg-primary' : 'bg-secondary'"
-          *ngFor="let i of [].constructor(totalQuestions); let index = index">
+        <span
+        class="badge m-1"
+        [ngClass]="{
+          'bg-primary': quesPointer === index,
+          'bg-secondary': quesPointer !== index && !skippedQuestions[index] && !isSelected(index),
+          'bg-success': selectedOptionList[categoryPointer].selectedOption[index],
+          'bg-warning': skippedQuestions[index]
+          
+        }"
+        *ngFor="let i of [].constructor(totalQuestions); let index = index"
+        (click)="setQuestionPointer(index)"
+      >
           {{ index + 1 }}
         </span>
       </ng-container>
@@ -29,17 +39,22 @@
             <app-loader></app-loader>
           </div>
           <ng-container *ngFor="let category of categories; let idx = index">
-            <div [ngClass]="{
+            <div
+              [ngClass]="{
                 'text-primary fw-bold':
                   currentCategory.cat_name === category.cat_name,
                 'text-secondary fw-bold':
                   currentCategory.cat_name !== category.cat_name
-              }">
+              }"
+            >
               {{ category.cat_name }}
-              <span class="badge" [ngClass]="{
+              <span
+                class="badge"
+                [ngClass]="{
                   'bg-primary': currentCategory.cat_name === category.cat_name,
                   'bg-secondary': currentCategory.cat_name !== category.cat_name
-                }">
+                }"
+              >
                 {{ totalQuestions }}
               </span>
             </div>
@@ -54,16 +69,27 @@
     </div>
     <div class="col-10">
       <div>
-        <div *ngIf="isTestFinish" [@slideInOut] class="bg-warning rounded border border-warning">
+        <div
+          *ngIf="isTestFinish"
+          [@slideInOut]
+          class="bg-warning rounded border border-warning"
+        >
           <div class="card bg-warning">
             <div class="card-body">
               <h2 class="card-title">Test Finished!</h2>
               <div class="mt-4 mb-4">
-                <h4>Total Questions: {{grandTotalQues}}</h4>
-                <h5>Total Correct Answers: <span class="text-success"> {{totalCorrect}}</span></h5>
-                <h5>Total Incorrect Answers: <span class="text-danger"> {{totalIncorrect}}</span></h5>
+                <h4>Total Questions: {{ grandTotalQues }}</h4>
+                <h5>
+                  Total Correct Answers:
+                  <span class="text-success"> {{ totalCorrect }}</span>
+                </h5>
+                <h5>
+                  Total Incorrect Answers:
+                  <span class="text-danger"> {{ totalIncorrect }}</span>
+                </h5>
                 <span class="text-muted">
-                  Your Total Score is {{grandScore}} out of {{grandTotalQues}}
+                  Your Total Score is {{ grandScore }} out of
+                  {{ grandTotalQues }}
                 </span>
               </div>
               <br />
@@ -74,7 +100,11 @@
           </div>
         </div>
 
-        <div *ngIf="isCategoryFinish && !isTestFinish" [@slideInOut] class="bg-warning rounded border border-warning">
+        <div
+          *ngIf="isCategoryFinish && !isTestFinish"
+          [@slideInOut]
+          class="bg-warning rounded border border-warning"
+        >
           <div class="card bg-warning">
             <div class="card-body">
               <h5 class="card-title">
@@ -87,14 +117,22 @@
                 </span>
               </div>
               <br />
-              <button id="submitBtn" class="btn btn-lg btn-success" (click)="nextQuestion()">
+              <button
+                id="submitBtn"
+                class="btn btn-lg btn-success"
+                (click)="nextQuestion()"
+              >
                 <i class="bi bi-hourglass-split"></i> Proceed to Next Category
               </button>
             </div>
           </div>
         </div>
 
-        <div class="card mb-4" *ngIf="!isCategoryFinish && !isTestFinish" [@fadeInOut]>
+        <div
+          class="card mb-4"
+          *ngIf="!isCategoryFinish && !isTestFinish"
+          [@fadeInOut]
+        >
           <div class="card-body">
             <div *ngIf="loaderQuestion">
               <app-loader></app-loader>
@@ -105,12 +143,21 @@
             </h5>
             <ng-container *ngFor="let opt of currentQuestion.options">
               <div class="form-check">
-                
-                <input class="form-check-input" type="radio" name="option" [value]="opt.option_id"
-                  [(ngModel)]="selectedOptionList[categoryPointer].selectedOption[quesPointer]"
-                  (change)="onOptionChange(opt.option_id)" [checked]="isSelected(opt.option_id)" />
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="option"
+                  [value]="opt.option_id"
+                  [(ngModel)]="
+                    selectedOptionList[categoryPointer].selectedOption[
+                      quesPointer
+                    ]
+                  "
+                  (change)="onOptionChange(opt.option_id)"
+                  [checked]="isSelected(opt.option_id)"
+                />
                 <label class="form-check-label" for="option">
-                  {{ opt.option_text }} 
+                  {{ opt.option_text }}
                 </label>
               </div>
             </ng-container>
@@ -118,12 +165,25 @@
           <div class="card-footer">
             <div class="row">
               <div class="col-6">
-                <button class="btn btn-primary" [disabled]="quesPointer == 0" (click)="previousQuestion()">
+                <button
+                  class="btn btn-primary"
+                  [disabled]="quesPointer == 0"
+                  (click)="previousQuestion()"
+                >
                   <i class="bi bi-skip-backward-fill"></i> Previous
                 </button>
               </div>
               <div class="col-6 text-end">
-                <button id="submitBtn" class="btn btn-primary" [disabled]="isTestFinish" (click)="nextQuestion()">
+                <button class="btn btn-warning" (click)="skipQuestion()">
+                  Skip <i class="bi bi-skip-forward-fill"></i>
+                </button>
+
+                <button
+                  id="submitBtn"
+                  class="btn btn-primary"
+                  [disabled]="isTestFinish"
+                  (click)="nextQuestion()"
+                >
                   Next <i class="bi bi-skip-forward-fill"></i>
                 </button>
               </div>
@@ -138,14 +198,13 @@
           </div>
         </div>
 
-        <!-- <div class="mt-3 p-3 border border-danger text-danger">
+         <div class="mt-3 p-3 border border-danger text-danger">
           Score: {{ score }} -- Grand Score: {{grandScore}}<br />
           Result Array: {{ resultArray | json }}<br>
           <div class="text-success">
             Option Selection {{selectedOptionList | json}}
           </div>
-        </div> -->
-
+        </div> 
       </div>
     </div>
   </div>

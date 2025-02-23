@@ -51,6 +51,7 @@ export class LoginComponent implements OnInit {
           }
         },
         error: (error) => {
+          this.loading = false;
           this.errorMessage = error.error.message || 'An error occurred during login from the server';
         },
         complete: () => {

@@ -22,6 +22,8 @@ export interface AuthResponse {
   message: string;
   token?: string;
   user?: any;
+  userId?: string,
+  name?: string
 }
 
 @Injectable({
@@ -57,6 +59,8 @@ export class UserManagementService {
         // Store token in localStorage if login is successful
         if (response.success && response.token) {
           localStorage.setItem('loginUser',loginData.email);
+          localStorage.setItem('loginUserId', response.userId ?? '');
+          localStorage.setItem('loginUserName', response.name ?? '');
           localStorage.setItem('token', response.token);
         }
         return response;

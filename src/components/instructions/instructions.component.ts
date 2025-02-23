@@ -10,9 +10,11 @@ import { Router } from '@angular/router';
 })
 export class InstructionsComponent {
   loginUserEmail: string = '';
-
+  loginUserName: string = '';
+  
   constructor(private _router:Router) {
     this.loginUserEmail = localStorage.getItem('loginUser') || '';
+    this.loginUserName = localStorage.getItem('loginUserName') || ''; 
   }
 
   onProceed(){

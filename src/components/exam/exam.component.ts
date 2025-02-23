@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -39,7 +39,7 @@ import {
     ]),
   ],
 })
-export class ExamComponent {
+export class ExamComponent implements OnInit {
   questions: any[] = [];
   categories: any[] = [];
   currentQuestion: any = {};
@@ -62,6 +62,8 @@ export class ExamComponent {
   totalCorrect:number = 0;
   totalIncorrect:number = 0;
   totalSkippedQues:number = 0;
+  skippedQuestions: boolean[] = new Array(this.totalQuestions).fill(false); // Track skipped questions
+
   constructor(private examService: ExamManagementService) {}
 
   ngOnInit() {
@@ -126,6 +128,8 @@ export class ExamComponent {
       });
   }
 
+
+
   nextQuestion() {
     if (this.categoryPointer == this.categories.length - 1) {
         if (this.quesPointer == this.questions.length - 1) {
@@ -152,7 +156,7 @@ export class ExamComponent {
                 totalSkipped: this.totalSkippedQues,
                 resultArray: this.resultArray
             };
-
+            
             // Assuming user ID 1 for testing - replace with actual user ID in production
             this.examService.saveExamResults(1, resultData).subscribe({
                 next: (response) => console.log('Results saved successfully:', response),
@@ -165,10 +169,12 @@ export class ExamComponent {
 
     // Logic to change Category and Question on next button click
     if (this.quesPointer < this.totalQuestions) {
-      // if(this.selectedOptionList[this.categoryPointer].selectedOption[this.quesPointer] === undefined){
-      //   this.selectedOptionList[this.categoryPointer].selectedOption[this.quesPointer] = null;
-      //   this.totalSkippedQues+=1;
-      // }
+      if (this.selectedOptionList[this.categoryPointer].selectedOption[this.quesPointer] === undefined) {
+        this.skippedQuestions[this.quesPointer] = true;
+        this.totalSkippedQues += 1;
+      } else {
+        this.skippedQuestions[this.quesPointer] = false;
+      }
       this.calculateScore();
       this.quesPointer += 1; //Increment the question pointer
       if (this.questions[this.quesPointer] !== undefined) {
@@ -257,13 +263,30 @@ export class ExamComponent {
     this.selectedOptionList[this.categoryPointer].selectedOption[
       this.quesPointer
     ] = optionId;
+    if (this.skippedQuestions[this.quesPointer]) {
+      this.skippedQuestions[this.quesPointer] = false;
+    }
   }
 
   isSelected(optionId: number): boolean {
+    //console.log(optionId);
     return (
       this.selectedOptionList[this.categoryPointer].selectedOption[
         this.quesPointer
       ] === optionId
     );
+  }
+
+  // Method to set the question pointer
+  setQuestionPointer(index: number): void {
+    this.quesPointer = index;
+    this.currentQuestion = this.questions[this.quesPointer];
+    //  this.resultArray[this.categoryPointer].answers.pop();
+  }
+
+  // Method to skip the current question
+  skipQuestion(): void {
+    this.skippedQuestions[this.quesPointer] = true;
+    this.nextQuestion();
   }
 }
